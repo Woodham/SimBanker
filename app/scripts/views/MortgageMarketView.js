@@ -41,7 +41,6 @@ define([
 
         houseClicked: function(event){
             var house = $(event.target).closest('.house');
-
             this.trigger('boughtMortgage', house);
             
         },

@@ -32,6 +32,7 @@ define([
         initialize: function(){
 
             this.clickCount = 0;
+            this.subprime = false;
 
             this.banker = {
                 amount: 0
@@ -73,6 +74,7 @@ define([
             this.listenTo(this.bankerView, 'broughtUpgrade', this.onBroughtUpgrade);
             this.listenTo(this.investorView, 'soldCDO', this.onSoldCDO);
             this.listenTo(this.bankerView, 'gotLoan', this.onGotLoan);
+            this.listenTo(this.bankerView, 'switchToSubPrime', this.switchToSubPrime);
             this.listenTo(this.mortgageInventoryView.collection, 'defaulted', this.onDefault);
             this.listenTo(this.cdoInventoryView.collection, 'defaultedCDO', this.onDefaultCDO);
         },
@@ -130,17 +132,15 @@ define([
             this.incomeView.updateIncomeIncrement();
 
             this.banker.amount += (this.income.increment - this.income.loan);
-            if(this.banker.amount>10000){
-                this.mortgageMarketView.spawnHelper.setSpawnInterval(15000);
-            }
-            if(this.banker.amount>30000){
-                this.mortgageMarketView.spawnHelper.setSpawnInterval(60000);
+            
+            if(this.mortgageMarketView.spawnHelper.spawnInterval>10000) {
+                this.bankerView.showSubprimeUpgrade();
             }
 
             this.mortgageInventoryView.collection.mortgageDefault();
             this.cdoInventoryView.collection.cdoDefault();
 
-            this.bankerView.updateBankerImage();
+            this.bankerView.updateBankerImage(this.clickCount);
             this.bankerView.updateCalculatorDisplay();
             this.bankerView.updateResearchPanel();
 
@@ -154,13 +154,16 @@ define([
             if (this.banker.amount > worth) {
                 this.clickCount++;
                 
+                //every time a mortgage is bought, increase the interval between mortgages showing
+                this.mortgageMarketView.spawnHelper.spawnInterval = this.mortgageMarketView.spawnHelper.spawnInterval*1.2;
+
                 if(this.clickCount % 3 == 0) {
                     this.housePriceView.updatePrice();
                 }
 
-                if(this.clickCount>102) {
-                    this.investorView.investorHelper.stopInvestors();
-                    this.mortgageInventoryView.collection.setDefaultChance(0.4);
+                if(this.subprime) {
+                     this.mortgageInventoryView.collection.increaseDefaultChance();
+                     this.investorView.investorHelper.increaseVisitInterval();
                 }
 
                 this.banker.amount -= worth;
@@ -169,9 +172,15 @@ define([
 
                 this.mortgageInventoryView.collection.add(mortgageModel);
                 mortgage.remove();
-            }else {
+            } else {
                 this.mortgageMarketView.displayLowFundsTooltip();
             }
+        },
+
+        switchToSubPrime: function() {
+            this.subprime = true;
+            this.mortgageMarketView.spawnHelper.setSpawnInterval(500);
+            this.mortgageInventoryView.collection.increaseDefaultChance();
         },
 
         onBroughtUpgrade: function(upgrade) {

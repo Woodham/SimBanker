@@ -14,12 +14,11 @@ define([
 
         render: function(){
             this.$el = cdoTemplate();
-            //this.tooltipHelper = new TooltipHelper();
+            this.tooltipHelper = new TooltipHelper();
             return this;
         },
 
         remove: function(){
-            /*
             var boundRemove = _(Backbone.View.prototype.remove).bind(this);
 
             //console.log("CDO: remove");
@@ -31,8 +30,6 @@ define([
             this.$el.animate({opacity: 0}, 1000, function(){
                 boundRemove();
             });
-            */
-            this.remove();
         },
     });
 });

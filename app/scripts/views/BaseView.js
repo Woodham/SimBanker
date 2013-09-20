@@ -10,7 +10,8 @@ define([
     'helpers/MortgageHelper',
     'helpers/InvestorDemandHelper',
     'mustache!base',
-    'helpers/LoanHelper'
+    'helpers/LoanHelper',
+     'mustache!gameOver'
 ], function(
     MortgageMarketView,
     NewsTickerView,
@@ -23,7 +24,8 @@ define([
     MortgageHelper,
     InvestorDemandHelper,
     baseTemplate,
-    LoanHelper
+    LoanHelper,
+    gameOver
 ) {
     'use strict';
 
@@ -127,6 +129,21 @@ define([
         },
 
         onTick: function(){
+            console.log("Default rate " + this.mortgageInventoryView.collection.defaultChance);
+            console.log("Spawn interval " + this.mortgageMarketView.spawnHelper.spawnInterval);
+            console.log("My mortgage count " + this.mortgageInventoryView.getNoMortgages());
+
+            if(this.mortgageInventoryView.collection.defaultChance>0.65 
+                && this.mortgageInventoryView.getNoMortgages()==0
+                && (this.banker.amount < 500 || this.mortgageMarketView.spawnHelper.spawnInterval > 20000)) {
+                if(this.$('.game-over-div').find('.game-over').length == 0) {
+                    var timeout = window.setTimeout(function() {
+                        this.$('.game-over-div').append(gameOver());
+                    }, 10000);
+          
+                }
+            }
+            
             this.income.loan = this.loanHelper.getPayment();
 
             this.incomeView.updateIncomeIncrement();
@@ -163,7 +180,12 @@ define([
 
                 if(this.subprime) {
                      this.mortgageInventoryView.collection.increaseDefaultChance();
-                     this.investorView.investorHelper.increaseVisitInterval();
+                     if(this.mortgageInventoryView.collection.defaultChance>0.4) {
+                        this.investorView.investorHelper.stopInvestors();
+                        this.bankerView.showEvilBanker();
+                     } else {
+                         this.investorView.investorHelper.increaseVisitInterval();
+                     }
                 }
 
                 this.banker.amount -= worth;
@@ -181,6 +203,7 @@ define([
             this.subprime = true;
             this.mortgageMarketView.spawnHelper.setSpawnInterval(500);
             this.mortgageInventoryView.collection.increaseDefaultChance();
+            this.mortgageMarketView.spawnHelper.spawnMortgage();
         },
 
         onBroughtUpgrade: function(upgrade) {

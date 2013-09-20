@@ -55,7 +55,8 @@ define([
 
         displayLowFundsTooltip: function(){
             var tooltipData = {
-                message: 'Low Funds! Get a loan!',
+                message: 'Low funds!',
+                //trigger tooltip on CDO or loan to show
                 top: 64,
                 left: 64,
             };

@@ -9,9 +9,8 @@ define([
 ){
     'use strict';
 
-    var MEDIUM_BANKER_THRESHOLD = 15,
-        FAT_BANKER_THRESHOLD = 96,
-        EVIL_BANKER_THRESHOLD = 104;
+    var MEDIUM_BANKER_THRESHOLD = 4000,
+        FAT_BANKER_THRESHOLD = 8000;
 
     function formatNaturalNumber(number){
 
@@ -97,13 +96,13 @@ define([
             this.$('.calculator-display').html(formattedAmount);
         },
 
-        updateBankerImage: function(clickCount){
-            if(clickCount >= MEDIUM_BANKER_THRESHOLD && clickCount < FAT_BANKER_THRESHOLD){
+        updateBankerImage: function(){
+            var amount = this.banker.amount;
+
+            if(amount >= MEDIUM_BANKER_THRESHOLD && amount < FAT_BANKER_THRESHOLD){
                 this.showMediumBanker();
-            } else if(clickCount >= FAT_BANKER_THRESHOLD && clickCount < EVIL_BANKER_THRESHOLD){
+            } else if(amount >= FAT_BANKER_THRESHOLD){
                 this.showFatBanker();
-            } else if(clickCount >= EVIL_BANKER_THRESHOLD){
-                this.showEvilBanker();
             }
         },
 

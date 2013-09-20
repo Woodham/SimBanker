@@ -74,10 +74,11 @@ define([
             this.listenTo(this.investorView, 'soldCDO', this.onSoldCDO);
             this.listenTo(this.bankerView, 'gotLoan', this.onGotLoan);
             this.listenTo(this.mortgageInventoryView.collection, 'defaulted', this.onDefault);
+            this.listenTo(this.cdoInventoryView.collection, 'defaultedCDO', this.onDefaultCDO);
         },
 
         events: {
-            "click": "advanceTicker",
+            //"click": "advanceTicker",
         },
 
         advanceTicker: function() {
@@ -124,6 +125,7 @@ define([
         },
 
         onTick: function(){
+            console.log("The length of CDO collection: " + this.cdoInventoryView.collection.length);
 
             this.income.loan = this.loanHelper.getPayment();
 
@@ -138,6 +140,7 @@ define([
             }
 
             this.mortgageInventoryView.collection.mortgageDefault();
+            this.cdoInventoryView.collection.cdoDefault();
 
             this.bankerView.updateBankerImage();
             this.bankerView.updateCalculatorDisplay();
@@ -199,6 +202,21 @@ define([
             this.incomeView.updateIncomeIncrement();
 
             this.banker.amount += mortgage.valuation;
+            this.bankerView.updateCalculatorDisplay();
+        },
+
+        onDefaultCDO: function(cdo){
+            var total = 0;
+
+            _.each(cdo.get('mortgages'), function(m) {
+                total += m.get('valuation');
+
+            });
+
+            this.income.increment -= total;
+            this.incomeView.updateIncomeIncrement();
+
+            this.banker.amount += total;
             this.bankerView.updateCalculatorDisplay();
         }
 

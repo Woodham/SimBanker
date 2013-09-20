@@ -72,8 +72,9 @@ define([
 
             this.cdoViews = _(this.cdoViews).without(viewToRemove);
 
-            $(viewToRemove.el).remove();
-            this.render();
+            viewToRemove.remove();
+            //$(viewToRemove.el).remove();
+            //this.render();
         },
 
         buyCDO: function() {

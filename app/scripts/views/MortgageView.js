@@ -8,9 +8,6 @@ define([
     'use strict';
 
     return Backbone.View.extend({
-
-
-
         render: function(houseType){
             this.$el = mortgageTemplate({type: houseType});
             this.tooltipHelper = new TooltipHelper();
@@ -30,7 +27,6 @@ define([
                 boundRemove();
             });
         },
-
 
     });
 });

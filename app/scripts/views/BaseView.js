@@ -125,8 +125,6 @@ define([
         },
 
         onTick: function(){
-            console.log("The length of CDO collection: " + this.cdoInventoryView.collection.length);
-
             this.income.loan = this.loanHelper.getPayment();
 
             this.incomeView.updateIncomeIncrement();

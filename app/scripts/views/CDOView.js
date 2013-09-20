@@ -21,9 +21,7 @@ define([
         remove: function(){
             var boundRemove = _(Backbone.View.prototype.remove).bind(this);
 
-            //console.log("CDO: remove");
             if (this.model.isDefaulted) {
-                //console.log("CDO: defaulted");
                 this.tooltipHelper.removeTooltip(this.tooltipHelper.displayTooltip("CDO: Defaulted!", this.$el));
             }
             
